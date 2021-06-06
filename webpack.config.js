@@ -1,22 +1,36 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const nodeExternals = require('webpack-node-externals');
+const Dotenv = require('dotenv-webpack');
 
 const makeConfig = (entry, output, isServer) => {
+  const name = isServer ? "server" : "client";
+  const target = isServer ? "node" : "web";
+  const externals = [];
+  const plugins = [
+    new Dotenv()
+  ];
+
+  if (isServer) {
+    externals.push(nodeExternals());
+  } else {
+    plugins.push(
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, "./src/client/index.html")
+      })
+    );
+  }
+
   return {
-    name: isServer ? "server" : "client",
-    target: isServer ? "node" : "web",
-    entry: entry,
+    name,
+    target,
+    entry,
     output: {
       ...output,
       clean: true
     },
-    externals: isServer ? [nodeExternals()] : [],
-    plugins: isServer ? [] : [
-      new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, "./src/client/index.html")
-      })
-    ],
+    externals,
+    plugins,
     resolve: {
       alias: {
         common: path.resolve(__dirname, "./src/common"),

@@ -1,18 +1,20 @@
 import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'path';
 import { AppController } from "./app.controller";
 import { User } from "./model/user";
-console.log(join(__dirname, "../../dist/client/js"))
+
+
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
-      port: 3306,
-      username: 'user',
-      password: '11197811',
-      database: 'test',
+      port: Number(process.env.DATABASE_POST),
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASS,
+      database: process.env.DATABASE_NAME,
       entities: [User],
       synchronize: true,
     }),
